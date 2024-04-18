@@ -1,30 +1,37 @@
 //! # プロットのチュートリアル
 //! 参考: <https://github.com/emilk/egui/blob/master/examples/save_plot/src/main.rs>
 
-use eframe::egui;
-use egui_plot::{Legend, Line, Plot, PlotPoints};
+use std::f64::consts::PI;
+
+use eframe::{egui, Theme};
+use egui_plot::{Legend, Line, Plot, PlotPoints, Points};
+
+/// ウィンドウのサイズ
+const WINDOW_SIZE: [f32; 2] = [1000.0, 800.0];
 
 fn main() -> Result<(), eframe::Error> {
     // ロガーのセットアップ
     env_logger::init();
 
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([500.0, 400.0]),
+        viewport: egui::ViewportBuilder::default().with_inner_size(WINDOW_SIZE),
+        follow_system_theme: false,
+        default_theme: Theme::Light,
         ..Default::default()
     };
 
     eframe::run_native(
-        "My egui App with a plot.",
+        "Metaheuristics Visualizer",
         options,
-        Box::new(|_cc| Box::<MyApp>::default()),
+        Box::new(|_cc| Box::<VisualizerApp>::default()),
     )
 }
 
 /// アプリの中身
 #[derive(Default)]
-struct MyApp;
+struct VisualizerApp;
 
-impl eframe::App for MyApp {
+impl eframe::App for VisualizerApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // 四角形
         let mut plot_rect = None;
@@ -36,11 +43,15 @@ impl eframe::App for MyApp {
 
             // プロット
             let my_plot = Plot::new("My Plot").legend(Legend::default());
+
             // グラフのデータ
-            let graph: Vec<[f64; 2]> = vec![[0.0, 1.0], [2.0, 3.0]];
+            let curve: PlotPoints = (0..1000)
+                .map(|i| (2.0 * PI * i as f64 / 1000.0 - PI))
+                .map(|x| [x, x.sin()])
+                .collect();
 
             let inner = my_plot.show(ui, |plot_ui| {
-                plot_ui.line(Line::new(PlotPoints::from(graph)).name("curve"));
+                plot_ui.line(Line::new(curve).name("sin"));
             });
 
             plot_rect = Some(inner.response.rect);
