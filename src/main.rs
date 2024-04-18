@@ -45,13 +45,19 @@ impl eframe::App for VisualizerApp {
             let my_plot = Plot::new("My Plot").legend(Legend::default());
 
             // グラフのデータ
-            let curve: PlotPoints = (0..1000)
+            let sin_curve: PlotPoints = (0..1000)
                 .map(|i| (2.0 * PI * i as f64 / 1000.0 - PI))
                 .map(|x| [x, x.sin()])
                 .collect();
 
+            let cos_points: PlotPoints = (0..200)
+                .map(|i| (2.0 * PI * i as f64 / 200.0 - PI))
+                .map(|x| [x, x.cos()])
+                .collect();
+
             let inner = my_plot.show(ui, |plot_ui| {
-                plot_ui.line(Line::new(curve).name("sin"));
+                plot_ui.line(Line::new(sin_curve).name("sin"));
+                plot_ui.points(Points::new(cos_points).radius(1.0).name("cos"));
             });
 
             plot_rect = Some(inner.response.rect);
