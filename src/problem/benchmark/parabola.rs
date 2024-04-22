@@ -41,9 +41,7 @@ impl Parabola2d {
     fn eval(&self, x: f64, y: f64) -> f64 {
         let Self { a1, b1, a2, b2, .. } = &self;
         // 関数値を計算
-        let res = a1 * (x - b1).powf(2.0) + a2 * (y - b2).powf(2.0);
-
-        res
+        a1 * (x - b1).powf(2.0) + a2 * (y - b2).powf(2.0)
     }
 }
 
@@ -68,16 +66,14 @@ impl Problem for Parabola2d {
 }
 
 impl Neighbor for Parabola2d {
-    fn get_neighbor(&self, (x, y): &Self::X, rng: &mut ThreadRng) -> Self::X {
-        let (x_min, x_max) = self.x_range;
-        let (y_min, y_max) = self.y_range;
-
-        // 定義域の幅の 1/100 の距離の範囲内で移動する
-        let x_width = (x_max - x_min) * 0.01;
-        let y_width = (y_max - y_min) * 0.01;
-
-        let x_next = rng.gen_range(x - x_width..x + x_width);
-        let y_next = rng.gen_range(y - y_width..y + y_width);
+    fn get_neighbor(
+        &self,
+        (x, y): &Self::X,
+        (x_eps, y_eps): &Self::X,
+        rng: &mut ThreadRng,
+    ) -> Self::X {
+        let x_next = rng.gen_range(x - x_eps..=x + x_eps);
+        let y_next = rng.gen_range(y - y_eps..=y + y_eps);
 
         (x_next, y_next)
     }

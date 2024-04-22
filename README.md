@@ -2,7 +2,7 @@
 
 各種メタヒューリスティクス手法の実装
 
-## TODO
+## アルゴリズム
 
 - [ ] 遺伝的アルゴリズム
 - [ ] 焼きなまし法
@@ -15,3 +15,4 @@
 ## 参考
 
 - [最適化アルゴリズムを実装していくぞ](https://qiita.com/pocokhc/items/07b698cc426cadb3a64e)
+- [最適化アルゴリズムを評価するベンチマーク関数まとめ](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda)
