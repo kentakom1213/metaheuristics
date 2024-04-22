@@ -2,8 +2,9 @@ pub mod problem {
     pub mod problem;
 
     /// 問題例
-    pub mod examples {
-        pub mod parabola2d;
+    pub mod benchmark {
+        pub mod ackley;
+        pub mod parabola;
     }
 }
 
