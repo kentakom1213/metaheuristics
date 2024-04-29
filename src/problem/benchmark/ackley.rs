@@ -9,6 +9,7 @@ use std::{
     fs,
 };
 
+use egui_plotter::EguiBackend;
 use plotters::{
     backend::SVGBackend,
     chart::ChartBuilder,
@@ -56,7 +57,7 @@ impl Neighbor for Ackley1d {
 
 impl Ackley1d {
     /// 関数をプロットする
-    pub fn plot(
+    pub fn plot_svg(
         &self,
         _x_range @ (x_min, x_max): (f64, f64),
         _y_range @ (y_min, y_max): (f64, f64),
@@ -77,6 +78,57 @@ impl Ackley1d {
         // 枠の設定
         let mut chart = ChartBuilder::on(&root)
             .caption("Ackley function", ("Ubuntu Mono", 30).into_font())
+            .margin(5)
+            .x_label_area_size(30)
+            .y_label_area_size(30)
+            .build_cartesian_2d(x_min..x_max, y_min..y_max)?;
+
+        // 枠の描画
+        chart.configure_mesh().draw()?;
+
+        // プロット
+        chart
+            .draw_series(LineSeries::new(
+                (0..num)
+                    .map(|x| x_min + x_width * (x as f64 / num as f64))
+                    .map(|x| (x, self.eval(&x))),
+                &RED,
+            ))?
+            .label("y = f(x)")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+
+        // ラベルの設定と描画
+        chart
+            .configure_series_labels()
+            .background_style(&WHITE.mix(0.8))
+            .border_style(&BLACK)
+            .draw()?;
+
+        // 結果の保存
+        root.present()?;
+
+        Ok(())
+    }
+
+    /// GUI画面に関数をプロットする
+    pub fn plot_eframe(
+        &self,
+        backend: EguiBackend,
+        _x_range @ (x_min, x_max): (f64, f64),
+        _y_range @ (y_min, y_max): (f64, f64),
+        num: usize,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        assert!(x_min < x_max);
+        // プロット幅
+        let x_width = x_max - x_min;
+
+        let root = backend.into_drawing_area();
+
+        root.fill(&WHITE)?;
+
+        // 枠の設定
+        let mut chart = ChartBuilder::on(&root)
+            .caption("Ackley function", ("sans-serif", 30).into_font())
             .margin(5)
             .x_label_area_size(30)
             .y_label_area_size(30)
