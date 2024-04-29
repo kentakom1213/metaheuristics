@@ -16,3 +16,7 @@ pub mod opt {
         pub mod hill_climbing;
     }
 }
+
+pub mod plot {
+    pub mod plot;
+}
