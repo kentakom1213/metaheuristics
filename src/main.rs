@@ -3,6 +3,12 @@ use egui_plotter::EguiBackend;
 use metaheuristics::{
     opt::{algorithms::hill_climbing::HillClimbingAlgorithm, optimize::Optimizer},
     problem::{benchmark::ackley::Ackley1d, problem::Problem},
+    visualize::plot::{PlotOptimizer, PlotProblem},
+};
+use plotters::{
+    chart::ChartBuilder,
+    drawing::IntoDrawingArea,
+    style::{Color, IntoFont, BLACK, WHITE},
 };
 use std::marker::PhantomData;
 
@@ -46,15 +52,49 @@ impl<P: Problem, Opt: Optimizer<P>> Visualizer<P, Opt> {
     }
 }
 
-impl<P: Problem, Opt: Optimizer<P>> eframe::App for Visualizer<P, Opt> {
+impl<P: Problem + PlotProblem, Opt: Optimizer<P> + PlotOptimizer> eframe::App
+    for Visualizer<P, Opt>
+{
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         CentralPanel::default().show(ctx, |ui| {
             // 描画エリア
-            let root = EguiBackend::new(ui);
+            let root = EguiBackend::new(ui).into_drawing_area();
 
-            let ack = Ackley1d;
+            // 白で埋める
+            root.fill(&WHITE).ok();
 
-            ack.plot_eframe(root, (-30.0, 30.0), (0.0, 25.0), 1000).ok();
+            // 枠の設定
+            let mut chart: plotters::prelude::ChartContext<
+                '_,
+                EguiBackend<'_>,
+                plotters::prelude::Cartesian2d<
+                    plotters::coord::types::RangedCoordf64,
+                    plotters::coord::types::RangedCoordf64,
+                >,
+            > = ChartBuilder::on(&root)
+                .caption("Problem", ("sans-serif", 30).into_font())
+                .margin(5)
+                .x_label_area_size(30)
+                .y_label_area_size(30)
+                .build_cartesian_2d(-30.0..30.0, 0.0..25.0)
+                .unwrap();
+
+            // グリッドの描画
+            chart.configure_mesh().draw().ok();
+
+            // 目的関数のプロット
+            self.optimizer.plot_problem(&mut chart);
+
+            // ラベルの設定と描画
+            chart
+                .configure_series_labels()
+                .background_style(&WHITE.mix(0.8))
+                .border_style(&BLACK)
+                .draw()
+                .unwrap();
+
+            // 完了
+            root.present().ok();
         });
     }
 }

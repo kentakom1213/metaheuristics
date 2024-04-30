@@ -17,6 +17,6 @@ pub mod opt {
     }
 }
 
-pub mod plot {
+pub mod visualize {
     pub mod plot;
 }

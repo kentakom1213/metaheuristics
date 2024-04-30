@@ -19,6 +19,12 @@ pub trait Problem {
     fn eval(&self, x: &Self::X) -> Self::Y;
 }
 
+/// 1次元の問題
+/// - プロットに利用
+pub trait Coord1D<P: Problem> {
+    fn into_coord(x: &P::X, y: &P::Y) -> (f64, f64);
+}
+
 /// 近傍の取得
 pub trait Neighbor: Problem {
     /// 近傍を取得する

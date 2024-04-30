@@ -20,7 +20,10 @@ use plotters::{
 };
 use rand::Rng;
 
-use crate::problem::problem::{Neighbor, Problem};
+use crate::{
+    problem::problem::{Coord1D, Neighbor, Problem},
+    visualize::plot::{self, PlotProblem},
+};
 
 /// 1次元のAckley関数
 #[derive(Debug)]
@@ -159,5 +162,36 @@ impl Ackley1d {
         root.present()?;
 
         Ok(())
+    }
+}
+
+impl Coord1D<Ackley1d> for Ackley1d {
+    fn into_coord(&x: &<Ackley1d as Problem>::X, &y: &<Ackley1d as Problem>::Y) -> (f64, f64) {
+        (x, y)
+    }
+}
+
+/// 描画の粒度
+const NUM: usize = 1000;
+
+impl PlotProblem for Ackley1d {
+    fn plot_problem(&self, chart: &mut plot::Chart, _x_range: (f64, f64), _y_range: (f64, f64)) {
+        // xの定義域
+        let (x_min, x_max) = (-30.0, 30.0);
+
+        // プロット幅
+        let x_width = x_max - x_min;
+
+        // プロット
+        chart
+            .draw_series(LineSeries::new(
+                (0..NUM)
+                    .map(|x| x_min + x_width * (x as f64 / NUM as f64))
+                    .map(|x| (x, self.eval(&x))),
+                &RED,
+            ))
+            .unwrap()
+            .label("y = f(x)")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
     }
 }

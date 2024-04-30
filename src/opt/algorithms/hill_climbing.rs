@@ -1,10 +1,16 @@
 //! 山登り法の実装
 
+use plotters::{
+    element::Circle,
+    series::{LineSeries, PointSeries},
+    style::BLUE,
+};
 use rand::{rngs::ThreadRng, thread_rng};
 
 use crate::{
     opt::optimize::Optimizer,
-    problem::problem::{Neighbor, Problem},
+    problem::problem::{Coord1D, Neighbor, Problem},
+    visualize::plot::{PlotOptimizer, PlotProblem},
 };
 
 /// 山登り法
@@ -121,5 +127,23 @@ impl<P: Problem + Neighbor> Optimizer<P> for MultiHillClimbingAlgorithm<P> {
         }
 
         (&self.x[i_min], &self.score[i_min])
+    }
+}
+
+impl<P: Problem + PlotProblem + Coord1D<P>> PlotOptimizer for HillClimbingAlgorithm<P> {
+    fn plot_problem(&self, chart: &mut crate::visualize::plot::Chart) {
+        self.problem.plot_problem(chart, (0.0, 0.0), (0.0, 0.0));
+    }
+
+    fn plot_current_solution(&self, chart: &mut crate::visualize::plot::Chart) {
+        // 現在の点のプロット
+        chart
+            .draw_series(
+                [&self.x]
+                    .iter()
+                    .map(|&x| Circle::new(P::into_coord(x, &self.problem.eval(x)), 10, &BLUE)),
+            )
+            .unwrap()
+            .label("current solution");
     }
 }
