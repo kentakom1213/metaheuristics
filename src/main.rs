@@ -1,4 +1,5 @@
 use eframe::egui::{self, CentralPanel, Visuals};
+use egui::{Slider, TopBottomPanel};
 use egui_plotter::EguiBackend;
 use metaheuristics::{
     opt::{algorithms::hill_climbing::HillClimbingAlgorithm, optimize::Optimizer},
@@ -31,6 +32,8 @@ struct Visualizer<P: Problem, Opt: Optimizer<P>> {
     /// 最適化用のインスタンス
     optimizer: Opt,
     phantom: PhantomData<P>,
+    /// ダミー変数
+    value: f64,
 }
 
 impl<P: Problem, Opt: Optimizer<P>> Visualizer<P, Opt> {
@@ -48,6 +51,7 @@ impl<P: Problem, Opt: Optimizer<P>> Visualizer<P, Opt> {
         Self {
             optimizer,
             phantom: PhantomData::<P>,
+            value: 0.0,
         }
     }
 }
@@ -56,7 +60,29 @@ impl<P: Problem + PlotProblem, Opt: Optimizer<P> + PlotOptimizer> eframe::App
     for Visualizer<P, Opt>
 {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        TopBottomPanel::top("top_panel").show(ctx, |ui| {
+            // The top panel is often a good place for a menu bar:
+
+            egui::menu::bar(ui, |ui| {
+                // NOTE: no File->Quit on web pages!
+                let is_web = cfg!(target_arch = "wasm32");
+                if !is_web {
+                    ui.add_space(16.0);
+                }
+
+                egui::widgets::global_dark_light_mode_buttons(ui);
+            });
+        });
+
         CentralPanel::default().show(ctx, |ui| {
+            // ボタン
+            ui.add(Slider::new(&mut self.value, 0.0..=10.0).text("value"));
+            if ui.button("Increment").clicked() {
+                self.value += 1.0;
+            }
+
+            ui.separator();
+
             // 描画エリア
             let root = EguiBackend::new(ui).into_drawing_area();
 
