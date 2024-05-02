@@ -39,7 +39,7 @@ impl Problem for Ackley1d {
 
     fn eval(&self, &x: &Self::X) -> Self::Y {
         // 範囲外の場合はINF
-        if x < -30.0 || 30.0 < x {
+        if !(-30.0..30.0).contains(&x) {
             return f64::INFINITY;
         }
 
@@ -98,13 +98,13 @@ impl Ackley1d {
                 &RED,
             ))?
             .label("y = f(x)")
-            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
 
         // ラベルの設定と描画
         chart
             .configure_series_labels()
-            .background_style(&WHITE.mix(0.8))
-            .border_style(&BLACK)
+            .background_style(WHITE.mix(0.8))
+            .border_style(BLACK)
             .draw()?;
 
         // 結果の保存
@@ -149,13 +149,13 @@ impl Ackley1d {
                 &RED,
             ))?
             .label("y = f(x)")
-            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
 
         // ラベルの設定と描画
         chart
             .configure_series_labels()
-            .background_style(&WHITE.mix(0.8))
-            .border_style(&BLACK)
+            .background_style(WHITE.mix(0.8))
+            .border_style(BLACK)
             .draw()?;
 
         // 結果の保存
@@ -188,10 +188,10 @@ impl PlotProblem for Ackley1d {
                 (0..NUM)
                     .map(|x| x_min + x_width * (x as f64 / NUM as f64))
                     .map(|x| (x, self.eval(&x))),
-                &RED,
+                RED,
             ))
             .unwrap()
             .label("y = f(x)")
-            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
     }
 }

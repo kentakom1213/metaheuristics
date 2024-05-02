@@ -1,10 +1,6 @@
 //! 山登り法の実装
 
-use plotters::{
-    element::Circle,
-    series::{LineSeries, PointSeries},
-    style::BLUE,
-};
+use plotters::{element::Circle, style::BLUE};
 use rand::{rngs::ThreadRng, thread_rng};
 
 use crate::{
@@ -141,7 +137,7 @@ impl<P: Problem + PlotProblem + Coord1D<P>> PlotOptimizer for HillClimbingAlgori
             .draw_series(
                 [&self.x]
                     .iter()
-                    .map(|&x| Circle::new(P::into_coord(x, &self.problem.eval(x)), 10, &BLUE)),
+                    .map(|&x| Circle::new(P::into_coord(x, &self.problem.eval(x)), 10, BLUE)),
             )
             .unwrap()
             .label("current solution");

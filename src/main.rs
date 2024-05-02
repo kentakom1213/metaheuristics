@@ -3,7 +3,7 @@ use egui_plotter::EguiBackend;
 use metaheuristics::{
     opt::{algorithms::hill_climbing::HillClimbingAlgorithm, optimize::Optimizer},
     problem::{benchmark::ackley::Ackley1d, problem::Problem},
-    visualize::plot::{PlotOptimizer, PlotProblem},
+    visualize::plot::{Chart, PlotOptimizer, PlotProblem},
 };
 use plotters::{
     chart::ChartBuilder,
@@ -64,14 +64,7 @@ impl<P: Problem + PlotProblem, Opt: Optimizer<P> + PlotOptimizer> eframe::App
             root.fill(&WHITE).ok();
 
             // 枠の設定
-            let mut chart: plotters::prelude::ChartContext<
-                '_,
-                EguiBackend<'_>,
-                plotters::prelude::Cartesian2d<
-                    plotters::coord::types::RangedCoordf64,
-                    plotters::coord::types::RangedCoordf64,
-                >,
-            > = ChartBuilder::on(&root)
+            let mut chart: Chart = ChartBuilder::on(&root)
                 .caption("Problem", ("sans-serif", 30).into_font())
                 .margin(5)
                 .x_label_area_size(30)
@@ -88,8 +81,8 @@ impl<P: Problem + PlotProblem, Opt: Optimizer<P> + PlotOptimizer> eframe::App
             // ラベルの設定と描画
             chart
                 .configure_series_labels()
-                .background_style(&WHITE.mix(0.8))
-                .border_style(&BLACK)
+                .background_style(WHITE.mix(0.8))
+                .border_style(BLACK)
                 .draw()
                 .unwrap();
 
